@@ -19,13 +19,28 @@ server.on("connection", (socket) => {
     socket.on('message', data => {
         try {
             const message = JSON.parse(data);
+
+            let broadcast = 'Broadcast: ';
             if (message.type === "chat") {
                 console.log("Chat received: ", message.payload);
+                broadcast += message.payload;
             } else if (message.type === "object") {
                 Object.entries(message.payload).forEach(([key, value]) => {
-                    console.log(`${key}: ${value}`);
+                    const objectMessage = `${key}: ${value}`;
+                    console.log(objectMessage);
+
+                    broadcast += objectMessage;
                 });
             }
+
+            /* Send message to all clients who are still listening */
+            server.clients.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(broadcast);
+                }
+            });
+
+            
         } catch {
             console.error('Message is not valid JSON!')
         }
