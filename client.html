@@ -1,12 +1,16 @@
 <script type="module">
     let socket;
+    let retryCount = 0;
+    const maxRetries = 3;
 
     function connect() {
+        console.log(`Connection attempt #${retryCount + 1}...`);
         socket = new WebSocket("ws://localhost:3000");
    
         socket.onopen = () => {
             console.log("Connected to server");
             socket.send(JSON.stringify({ type: "chat", payload: "Hello from client after connection!" }));
+            retryCount = 0;
         };
    
         socket.onmessage = (event) => {
@@ -14,12 +18,17 @@
         };
    
         socket.onclose = () => {
-            console.log("Connection closed. Retrying in 3 seconds...");
-            setTimeout(connect, 3000); // Wait 3 seconds then try again
+            if (retryCount < maxRetries) {
+                retryCount++;
+                console.log(`Connection lost. Retrying in 3s... (${retryCount}/${maxRetries})`);
+                setTimeout(connect, 3000);
+            } else {
+                console.error("Max retries reached. Stopping reconnection attempts.");
+            }
         };
    
         socket.onerror = (err) => {
-            console.error("Websocket error occurred! Onclose called.", error);
+            console.error("Websocket error occurred! Onclose called.", err);
         };
     }
 
@@ -34,6 +43,7 @@
     };
 
     connect();
+
     await waitForOpen(socket);
     socket.send(JSON.stringify({ type: "chat", payload: "Message from UI when connection is OPEN, with some data. We are not in the onopen callback!" }));
     socket.send(JSON.stringify({ type: "object", payload: { myMessage: "MyObject!" }}));
