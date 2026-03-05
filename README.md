@@ -19,3 +19,6 @@ In another terminal:
 ```bash
 node client.js
 ```
+
+## Test error
+Change for example ws url to :3001

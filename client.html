@@ -20,6 +20,10 @@
         console.log("Message from server: ", event.data);
     }
 
+    socket.onerror = (error) => {
+        console.error("Websocket error:", error);
+    }
+
     await waitForOpen(socket);
     socket.send('Message from UI when connection is OPEN (but not in onopen callback)!');
 </script>
