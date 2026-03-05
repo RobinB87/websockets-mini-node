@@ -8,5 +8,15 @@ const server = new WebSocket.Server({ port: 3000 });
  We will receive a socket object; a single open connection to ONE specific client
 */
 server.on("connection", (socket) => {
-    console.log('Someone connected!');
+    console.log('A user connected');
+
+    /* 
+     Server can now listen for messages from client
+     WebSockets do not use requests or routes, they use events
+    */
+    socket.on('message', message => {
+        console.log('Client says:', message.toString());
+    });
+
+    socket.send('Welcome!');
 });
