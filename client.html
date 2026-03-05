@@ -1,5 +1,15 @@
-<script>
+<script type="module">
     const socket = new WebSocket("ws://localhost:3000");
+
+    const waitForOpen = (socket) => {
+        return new Promise((resolve) => {
+            if (socket.readyState === WebSocket.OPEN) {
+                resolve();
+            } else {
+                socket.addEventListener("open", resolve, { once: true });
+            }
+        });
+    };
 
     socket.onopen = () => {
         console.log("Connected to server");
@@ -9,4 +19,7 @@
     socket.onmessage = (event) => {
         console.log("Message from server: ", event.data);
     }
+
+    await waitForOpen(socket);
+    socket.send('Message from UI when connection is OPEN (but not in onopen callback)!');
 </script>
