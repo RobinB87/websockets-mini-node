@@ -1,7 +1,29 @@
 <script type="module">
-    const socket = new WebSocket("ws://localhost:3000");
+    let socket;
 
-    const waitForOpen = (socket) => {
+    function connect() {
+        socket = new WebSocket("ws://localhost:3000");
+   
+        socket.onopen = () => {
+            console.log("Connected to server");
+            socket.send(JSON.stringify({ type: "chat", payload: "Hello from client after connection!" }));
+        };
+   
+        socket.onmessage = (event) => {
+            console.log("Message from server: ", event.data);
+        };
+   
+        socket.onclose = () => {
+            console.log("Connection closed. Retrying in 3 seconds...");
+            setTimeout(connect, 3000); // Wait 3 seconds then try again
+        };
+   
+        socket.onerror = (err) => {
+            console.error("Websocket error occurred! Onclose called.", error);
+        };
+    }
+
+    function waitForOpen(socket) {
         return new Promise((resolve) => {
             if (socket.readyState === WebSocket.OPEN) {
                 resolve();
@@ -11,19 +33,7 @@
         });
     };
 
-    socket.onopen = () => {
-        console.log("Connected to server");
-        socket.send(JSON.stringify({ type: "chat", payload: "Hello world!" }));
-    };
-
-    socket.onmessage = (event) => {
-        console.log("Message from server: ", event.data);
-    }
-
-    socket.onerror = (error) => {
-        console.error("Websocket error:", error);
-    }
-
+    connect();
     await waitForOpen(socket);
     socket.send(JSON.stringify({ type: "chat", payload: "Message from UI when connection is OPEN, with some data. We are not in the onopen callback!" }));
     socket.send(JSON.stringify({ type: "object", payload: { myMessage: "MyObject!" }}));
