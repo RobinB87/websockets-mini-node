@@ -46,3 +46,17 @@ server.on("connection", (socket) => {
         }
     });
 });
+
+setInterval(() => {
+    const timestamp = new Date().toLocaleTimeString();
+    const systemUpdate = JSON.stringify({
+        type: "system_update",
+        payload: `Server time is now: ${timestamp}`
+    });
+
+    server.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(systemUpdate);
+        }
+    });
+}, 10000);

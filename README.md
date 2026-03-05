@@ -20,5 +20,8 @@ In another terminal:
 node client.js
 ```
 
-## Test error
-Change for example ws url to :3001
+## Test
+
+1. onerror: Change for example ws url to :3001
+2. retry: open html without server started, or kill server while html is connected, and/or reconnect while it is retrying
+3. various clients: open multiple tabs and see how it is pushing messages to all clients

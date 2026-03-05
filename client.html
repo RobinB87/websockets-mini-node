@@ -1,3 +1,7 @@
+<div id="status-container" style="padding: 10px; border: 1px solid #ccc;">
+    <strong>Server Time:</strong> <span id="server-time">Waiting for update...</span>
+</div>
+
 <script type="module">
     let socket;
     let retryCount = 0;
@@ -14,7 +18,16 @@
         };
    
         socket.onmessage = (event) => {
-            console.log("Message from server: ", event.data);
+            try {
+                // should convert all server messages to a certain JSON with message.type, but it is fine for now
+                const message = JSON.parse(event.data);
+                if (message.type === "system_update") {
+                    document.getElementById("server-time").textContent = message.payload;
+                }
+            } catch {
+                console.log("Message from server: ", event.data);
+            }
+            
         };
    
         socket.onclose = () => {
