@@ -13,7 +13,7 @@
 
     socket.onopen = () => {
         console.log("Connected to server");
-        socket.send("Hello from the browser!");
+        socket.send(JSON.stringify({ type: "chat", payload: "Hello world!" }));
     };
 
     socket.onmessage = (event) => {
@@ -25,5 +25,6 @@
     }
 
     await waitForOpen(socket);
-    socket.send('Message from UI when connection is OPEN (but not in onopen callback)!');
+    socket.send(JSON.stringify({ type: "chat", payload: "Message from UI when connection is OPEN, with some data. We are not in the onopen callback!" }));
+    socket.send(JSON.stringify({ type: "object", payload: { myMessage: "MyObject!" }}));
 </script>
