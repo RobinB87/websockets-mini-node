@@ -10,21 +10,24 @@ const server = new WebSocket.Server({ port: 3000 });
 server.on("connection", (socket) => {
     console.log('A user connected');
 
+    socket.send('Welcome!');
+
     /* 
      Server can now listen for messages from client
      WebSockets do not use requests or routes, they use events
     */
     socket.on('message', data => {
-        const message = JSON.parse(data);
-
-        if (message.type === "chat") {
-            console.log("Chat received: ", message.payload);
-        } else if (message.type === "object") {
-            Object.entries(message.payload).forEach(([key, value]) => {
-                console.log(`${key}: ${value}`);
-            });
+        try {
+            const message = JSON.parse(data);
+            if (message.type === "chat") {
+                console.log("Chat received: ", message.payload);
+            } else if (message.type === "object") {
+                Object.entries(message.payload).forEach(([key, value]) => {
+                    console.log(`${key}: ${value}`);
+                });
+            }
+        } catch {
+            console.error('Message is not valid JSON!')
         }
     });
-
-    socket.send('Welcome!');
 });
